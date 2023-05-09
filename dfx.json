@@ -1,8 +1,8 @@
 {
-    "canisters": {
-      "first_canister": {
-        "main": "main.mo",
-        "type": "motoko"
-      }
+  "canisters": {
+    "Calculator": {
+      "main": "main.mo",
+      "type": "motoko"
     }
   }
+}
