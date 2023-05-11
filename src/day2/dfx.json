@@ -1,6 +1,6 @@
 {
   "canisters": {
-    "day2": {
+    "HomeworkDiary": {
       "main": "main.mo",
       "type": "motoko"
     }
