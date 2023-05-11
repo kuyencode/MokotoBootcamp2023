@@ -1,6 +1,6 @@
 {
   "canisters": {
-    "day1": {
+    "Calculator": {
       "main": "main.mo",
       "type": "motoko"
     }
