@@ -10,27 +10,49 @@ import Account "Account";
 // when deploying to IC, import from "rww3b-zqaaa-aaaam-abioa-cai"
 import BootcampLocalActor "BootcampLocalActor";
 
+var ledger = TrieMap.TrieMap<Account.Account, Nat>(Account.accountsEqual, Account.accountsHash);
+
+let studentCanister = actor ("rww3b-zqaaa-aaaam-abioa-cai") : actor{
+  getAllStudentsPrincipal : shared query () -> async [Principal];
+};
+
 actor class MotoCoin() {
+
+  let mCoin = {
+  name : Text = "MotoCoin";
+  symbol : Text = "MOC";
+  supply : Nat = 0;
+  };
+
   public type Account = Account.Account;
+  public type Subaccount = Account.Subaccount;
 
   // Returns the name of the token
   public query func name() : async Text {
-    return "";
+    return mCoin.name;
   };
 
   // Returns the symbol of the token
   public query func symbol() : async Text {
-    return "";
+    return mCoin.symbol;
   };
 
   // Returns the the total number of tokens on all accounts
   public func totalSupply() : async Nat {
-    return 9;
+    return mCoin.supply;
   };
 
   // Returns the default transfer fee
   public query func balanceOf(account : Account) : async (Nat) {
-    return 9;
+
+    switch(ledger.get(account)){
+      case (null){
+        return 0;
+      };
+      case(?balance){
+        return balance; 
+      };
+    };
   };
 
   // Transfer tokens to another account
@@ -39,11 +61,26 @@ actor class MotoCoin() {
     to : Account,
     amount : Nat,
   ) : async Result.Result<(), Text> {
+    let fromAmount = Option.get(ledger.get(from), 0);
+    let toAmount = Option.get(ledger.get(to), 0);
+
+    if (fromAmount < amount){
+      return #err("Not enough to transfer");
+    };
     return #ok;
   };
 
   // Airdrop 1000 MotoCoin to any student that is part of the Bootcamp.
   public func airdrop() : async Result.Result<(), Text> {
-    return #err("not implemented");
+    let getStudent = await studentCanister.getAllStudentsPrincipal();
+    
+    for (students in getStudent.vals()){
+      var giveCoin = {
+        name = "MotoCoin";
+        symbol = "MOC";
+        supply = 100;
+      };
+    };
+    return #ok;
   };
 };
