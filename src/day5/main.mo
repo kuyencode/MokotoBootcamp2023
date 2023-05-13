@@ -12,27 +12,71 @@ import Debug "mo:base/Debug";
 import Buffer "mo:base/Buffer";
 
 import IC "Ic";
-import HTTP "Http";
 import Type "Types";
 
 actor class Verifier() {
   type StudentProfile = Type.StudentProfile;
 
+  let studentProfileStore = HashMap.HashMap<Principal, StudentProfile>(0, Principal.equal, Principal.hash);
+
+//Check if the Student exist.
+  private func _comfirmProfile( p : Principal) : Bool{
+    var profile = studentProfileStore.get(p);
+    switch (profile){
+      case (null){
+        return false;
+      };
+      case(profile){
+        return true;
+      };
+    };
+  };
+
   // STEP 1 - BEGIN
   public shared ({ caller }) func addMyProfile(profile : StudentProfile) : async Result.Result<(), Text> {
-    return #err("not implemented");
+    studentProfileStore.put(caller, profile);
+    return #ok();
   };
 
   public shared ({ caller }) func seeAProfile(p : Principal) : async Result.Result<StudentProfile, Text> {
-    return #err("not implemented");
+    let profile = studentProfileStore.get(p);
+    switch(profile){
+      case(null){
+        return #err ("invalid");
+      };
+      case(?profile){
+        return #ok(profile);
+      };
+    };
   };
 
   public shared ({ caller }) func updateMyProfile(profile : StudentProfile) : async Result.Result<(), Text> {
-    return #err("not implemented");
+    switch(_comfirmProfile(caller)){
+      case(false){
+        return #err("You are not a student");
+      };
+      case(true){
+        let newStudentProfile = {
+          name = profile.name;
+          Team = profile.Team;
+          graduate = false;
+        };
+        return #ok();
+      };
+    };
   };
 
   public shared ({ caller }) func deleteMyProfile() : async Result.Result<(), Text> {
-    return #err("not implemented");
+    let student = studentProfileStore.remove(caller);
+    switch(student){
+      case(null){
+        return #err("not implemented");
+      };
+      case(student){
+        return #ok();
+      }
+    };
+    
   };
   // STEP 1 - END
 
@@ -59,28 +103,4 @@ actor class Verifier() {
     return #err("not implemented");
   };
   // STEP 4 - END
-
-  // STEP 5 - BEGIN
-  public type HttpRequest = HTTP.HttpRequest;
-  public type HttpResponse = HTTP.HttpResponse;
-
-  // NOTE: Not possible to develop locally,
-  // as Timer is not running on a local replica
-  public func activateGraduation() : async () {
-    return ();
-  };
-
-  public func deactivateGraduation() : async () {
-    return ();
-  };
-
-  public query func http_request(request : HttpRequest) : async HttpResponse {
-    return ({
-      status_code = 200;
-      headers = [];
-      body = Text.encodeUtf8("");
-      streaming_strategy = null;
-    });
-  };
-  // STEP 5 - END
 };
