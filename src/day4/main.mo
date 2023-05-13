@@ -8,15 +8,15 @@ import Debug "mo:base/Debug";
 import Account "Account";
 // NOTE: only use for local dev,
 // when deploying to IC, import from "rww3b-zqaaa-aaaam-abioa-cai"
-import BootcampLocalActor "BootcampLocalActor";
-
-var ledger = TrieMap.TrieMap<Account.Account, Nat>(Account.accountsEqual, Account.accountsHash);
-
-let studentCanister = actor ("rww3b-zqaaa-aaaam-abioa-cai") : actor{
-  getAllStudentsPrincipal : shared query () -> async [Principal];
-};
+// import BootcampLocalActor "BootcampLocalActor";
 
 actor class MotoCoin() {
+
+  var ledger = TrieMap.TrieMap<Account.Account, Nat>(Account.accountsEqual, Account.accountsHash);
+
+  let studentCanister = actor ("rww3b-zqaaa-aaaam-abioa-cai") : actor{
+    getAllStudentsPrincipal : shared query () -> async [Principal];
+  };
 
   let mCoin = {
   name : Text = "MotoCoin";
@@ -72,14 +72,14 @@ actor class MotoCoin() {
 
   // Airdrop 1000 MotoCoin to any student that is part of the Bootcamp.
   public func airdrop() : async Result.Result<(), Text> {
-    let getStudent = await studentCanister.getAllStudentsPrincipal();
+    let getStudents = await studentCanister.getAllStudentsPrincipal();
     
-    for (students in getStudent.vals()){
-      var giveCoin = {
-        name = "MotoCoin";
-        symbol = "MOC";
-        supply = 100;
+    for (student in getStudents.vals()){
+      let updateStudent = {
+        owner = student;
+        subaccount = null;
       };
+      ledger.put(updateStudent, 100); 
     };
     return #ok;
   };
