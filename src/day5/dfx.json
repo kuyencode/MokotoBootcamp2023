@@ -3,6 +3,10 @@
     "day5": {
       "main": "main.mo",
       "type": "motoko"
+    },
+    "Calculator": {
+      "main": "main.mo",
+      "type": "motoko"
     }
   },
   "defaults": {
